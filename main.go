@@ -8,8 +8,10 @@ import (
 	driver "./driver"
 
 	ph "./handler/http"
+	jwtService "./service/jwt"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/jwtauth"
 )
 
 func main() {
@@ -19,6 +21,9 @@ func main() {
 	dbPort := os.Getenv("DB_PORT")
 
 	connection, err := driver.ConnectSQL(dbHost, dbPort, "admin", dbPass, dbName)
+	tokenAuth := jwtauth.New("HS256", []byte("secret"), nil)
+	jwtServiceObj := jwtService.Init(tokenAuth)
+
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
@@ -31,15 +36,25 @@ func main() {
 	organizerHandler := ph.InitOrganizerHandler(connection)
 	userHandler := ph.InitUserHandler(connection)
 	accountHandler := ph.InitAccountHandler(connection)
+	authHandler := ph.InitAuthHandler(connection, jwtServiceObj)
 	rundownHandler := ph.InitRundownHandler(connection)
 	rundownItemHandler := ph.InitRundownItemHandler(connection)
 
-	r.Route("/", func(rt chi.Router) {
-		rt.Mount("/organizer", initOrganizerRoute(organizerHandler))
-		rt.Mount("/user", initUserRoute(userHandler))
-		rt.Mount("/account", initAccountRoute(accountHandler))
-		rt.Mount("/rundown", initRundownRoute(rundownHandler))
-		rt.Mount("/rundown_item", initRundownItemRoute(rundownItemHandler))
+	r.Group(func(r chi.Router) {
+		r.Mount("/auth", initAuthRoute(authHandler))
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Use(jwtServiceObj.Verifier())
+		r.Use(jwtServiceObj.Authenticator())
+
+		r.Route("/", func(rt chi.Router) {
+			rt.Mount("/organizer", initOrganizerRoute(organizerHandler))
+			rt.Mount("/user", initUserRoute(userHandler))
+			rt.Mount("/account", initAccountRoute(accountHandler))
+			rt.Mount("/rundown", initRundownRoute(rundownHandler))
+			rt.Mount("/rundown_item", initRundownItemRoute(rundownItemHandler))
+		})
 	})
 
 	fmt.Println("Server listen at :8005")
@@ -75,6 +90,14 @@ func initAccountRoute(handler *ph.AccountHandler) http.Handler {
 	route.Get("/{id:[0-9]+}", handler.GetByID)
 	route.Put("/{id:[0-9]+}", handler.Update)
 	route.Delete("/{id:[0-9]+}", handler.Delete)
+
+	return route
+}
+
+func initAuthRoute(handler *ph.AuthHandler) http.Handler {
+	route := chi.NewRouter()
+	route.Post("/login", handler.Login)
+	route.Post("/register", handler.Register)
 
 	return route
 }

@@ -85,6 +85,42 @@ func (m *AccountRepository) GetByID(ctx context.Context, id int64) (*models.Acco
 	return payload, nil
 }
 
+func (m *AccountRepository) GetByUsernameAndPassword(ctx context.Context, username string, password string) (*models.Account, error) {
+	query := "Select id, username, password, user_id From accounts where username=? and password=?"
+
+	rows, err := m.fetch(ctx, query, username, password)
+	if err != nil {
+		return nil, err
+	}
+
+	payload := &models.Account{}
+	if len(rows) > 0 {
+		payload = rows[0]
+	} else {
+		return nil, models.ErrNotFound
+	}
+
+	return payload, nil
+}
+
+func (m *AccountRepository) GetByUsername(ctx context.Context, username string) (*models.Account, error) {
+	query := "Select id, username, password, user_id From accounts where username=?"
+
+	rows, err := m.fetch(ctx, query, username)
+	if err != nil {
+		return nil, err
+	}
+
+	payload := &models.Account{}
+	if len(rows) > 0 {
+		payload = rows[0]
+	} else {
+		return nil, models.ErrNotFound
+	}
+
+	return payload, nil
+}
+
 func (m *AccountRepository) Update(ctx context.Context, p *models.Account) (*models.Account, error) {
 	query := "Update accounts set username=?, password=? where id=?"
 

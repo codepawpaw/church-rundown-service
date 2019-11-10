@@ -26,6 +26,8 @@ type AccountRepository interface {
 	GetAll(ctx context.Context, num int64) ([]*models.Account, error)
 	Create(ctx context.Context, p *models.Account) (int64, error)
 	GetByID(ctx context.Context, id int64) (*models.Account, error)
+	GetByUsernameAndPassword(ctx context.Context, username string, password string) (*models.Account, error)
+	GetByUsername(ctx context.Context, username string) (*models.Account, error)
 	Update(ctx context.Context, p *models.Account) (*models.Account, error)
 	Delete(ctx context.Context, id int64) (bool, error)
 }
