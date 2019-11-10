@@ -41,87 +41,79 @@ func main() {
 	rundownItemHandler := ph.InitRundownItemHandler(connection)
 
 	r.Group(func(r chi.Router) {
-		r.Mount("/auth", initAuthRoute(authHandler))
+		r.Route("/public", func(rt chi.Router) {
+			rt.Route("/organizer", func(route chi.Router) {
+				route.Get("/", organizerHandler.GetAll)
+				route.Get("/{id:[0-9]+}", organizerHandler.GetByID)
+			})
+
+			rt.Route("/user", func(route chi.Router) {
+				route.Get("/{id:[0-9]+}", userHandler.GetByID)
+			})
+
+			rt.Route("/account", func(route chi.Router) {
+				route.Get("/{id:[0-9]+}", accountHandler.GetByID)
+			})
+
+			rt.Route("/rundown", func(route chi.Router) {
+				route.Get("/{organizerId:[0-9]+}", rundownHandler.GetByOrganizerId)
+				route.Get("/{organizerId:[0-9]+}/{startDate:[0-100]+}/{endDate:[0-100]+}", rundownHandler.GetByOrganizerIdAndDate)
+			})
+
+			rt.Route("/rundown_item", func(route chi.Router) {
+				route.Get("/{rundownId:[0-9]+}", rundownItemHandler.GetByRundownId)
+			})
+
+			rt.Route("/auth", func(route chi.Router) {
+				route.Post("/login", authHandler.Login)
+				route.Post("/register", authHandler.Register)
+			})
+		})
 	})
 
 	r.Group(func(r chi.Router) {
 		r.Use(jwtServiceObj.Verifier())
 		r.Use(jwtServiceObj.Authenticator())
 
-		r.Route("/", func(rt chi.Router) {
-			rt.Mount("/organizer", initOrganizerRoute(organizerHandler))
-			rt.Mount("/user", initUserRoute(userHandler))
-			rt.Mount("/account", initAccountRoute(accountHandler))
-			rt.Mount("/rundown", initRundownRoute(rundownHandler))
-			rt.Mount("/rundown_item", initRundownItemRoute(rundownItemHandler))
+		r.Route("/admin", func(rt chi.Router) {
+			rt.Route("/organizer", func(route chi.Router) {
+				route.Get("/{id:[0-9]+}", organizerHandler.GetByID)
+				route.Post("/", organizerHandler.CreateOrganizer)
+				route.Put("/{id:[0-9]+}", organizerHandler.Update)
+				route.Delete("/{id:[0-9]+}", organizerHandler.Delete)
+			})
+
+			rt.Route("/user", func(route chi.Router) {
+				route.Get("/{id:[0-9]+}", userHandler.GetByID)
+				route.Post("/", userHandler.Create)
+				route.Put("/{id:[0-9]+}", userHandler.Update)
+				route.Delete("/{id:[0-9]+}", userHandler.Delete)
+			})
+
+			rt.Route("/account", func(route chi.Router) {
+				route.Get("/{id:[0-9]+}", accountHandler.GetByID)
+				route.Post("/", accountHandler.Create)
+				route.Put("/{id:[0-9]+}", accountHandler.Update)
+				route.Delete("/{id:[0-9]+}", accountHandler.Delete)
+			})
+
+			rt.Route("/rundown", func(route chi.Router) {
+				route.Get("/{id:[0-9]+}", rundownHandler.GetByID)
+				route.Get("/{organizerId:[0-9]+}", rundownHandler.GetByOrganizerId)
+				route.Post("/", rundownHandler.Create)
+				route.Put("/{id:[0-9]+}", rundownHandler.Update)
+				route.Delete("/{id:[0-9]+}", rundownHandler.Delete)
+			})
+
+			rt.Route("/rundown_item", func(route chi.Router) {
+				route.Get("/{rundownId:[0-9]+}", rundownItemHandler.GetByRundownId)
+				route.Post("/", rundownItemHandler.Create)
+				route.Put("/{id:[0-9]+}", rundownItemHandler.Update)
+				route.Delete("/{id:[0-9]+}", rundownItemHandler.Delete)
+			})
 		})
 	})
 
 	fmt.Println("Server listen at :8005")
 	http.ListenAndServe(":3000", r)
-}
-
-func initOrganizerRoute(handler *ph.OrganizerHandler) http.Handler {
-	route := chi.NewRouter()
-	route.Post("/", handler.CreateOrganizer)
-	route.Get("/", handler.GetAll)
-	route.Get("/{id:[0-9]+}", handler.GetByID)
-	route.Put("/{id:[0-9]+}", handler.Update)
-	route.Delete("/{id:[0-9]+}", handler.Delete)
-
-	return route
-}
-
-func initUserRoute(handler *ph.UserHandler) http.Handler {
-	route := chi.NewRouter()
-	route.Post("/", handler.Create)
-	route.Get("/", handler.GetAll)
-	route.Get("/{id:[0-9]+}", handler.GetByID)
-	route.Put("/{id:[0-9]+}", handler.Update)
-	route.Delete("/{id:[0-9]+}", handler.Delete)
-
-	return route
-}
-
-func initAccountRoute(handler *ph.AccountHandler) http.Handler {
-	route := chi.NewRouter()
-	route.Post("/", handler.Create)
-	route.Get("/", handler.GetAll)
-	route.Get("/{id:[0-9]+}", handler.GetByID)
-	route.Put("/{id:[0-9]+}", handler.Update)
-	route.Delete("/{id:[0-9]+}", handler.Delete)
-
-	return route
-}
-
-func initAuthRoute(handler *ph.AuthHandler) http.Handler {
-	route := chi.NewRouter()
-	route.Post("/login", handler.Login)
-	route.Post("/register", handler.Register)
-
-	return route
-}
-
-func initRundownRoute(handler *ph.RundownHandler) http.Handler {
-	route := chi.NewRouter()
-	route.Post("/", handler.Create)
-	route.Get("/", handler.GetAll)
-	route.Get("/{organizerId:[0-9]+}", handler.GetByOrganizerId)
-	route.Get("/{organizerId:[0-9]+}/{startDate:[0-100]+}/{endDate:[0-100]+}", handler.GetByOrganizerIdAndDate)
-	route.Get("/{organizerId[0-9]+}/{id:[0-9]+}", handler.GetByOrganizerAndId)
-	route.Put("/{id:[0-9]+}", handler.Update)
-	route.Delete("/{id:[0-9]+}", handler.Delete)
-
-	return route
-}
-
-func initRundownItemRoute(handler *ph.RundownItemHandler) http.Handler {
-	route := chi.NewRouter()
-	route.Post("/", handler.Create)
-	route.Get("/", handler.GetAll)
-	route.Get("/{rundownId:[0-9]+}", handler.GetByRundownId)
-	route.Put("/{id:[0-9]+}", handler.Update)
-	route.Delete("/{id:[0-9]+}", handler.Delete)
-
-	return route
 }
