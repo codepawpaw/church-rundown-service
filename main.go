@@ -11,6 +11,7 @@ import (
 	jwtService "./service/jwt"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/cors"
 	"github.com/go-chi/jwtauth"
 )
 
@@ -40,14 +41,26 @@ func main() {
 	rundownHandler := ph.InitRundownHandler(connection)
 	rundownItemHandler := ph.InitRundownItemHandler(connection)
 
+	cors := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	})
+	r.Use(cors.Handler)
+
 	r.Group(func(r chi.Router) {
 		r.Route("/public", func(rt chi.Router) {
 			rt.Route("/organizer", func(route chi.Router) {
+				route.Post("/", organizerHandler.CreateOrganizer)
 				route.Get("/", organizerHandler.GetAll)
 				route.Get("/{id:[0-9]+}", organizerHandler.GetByID)
 			})
 
 			rt.Route("/user", func(route chi.Router) {
+				route.Post("/", userHandler.Create)
 				route.Get("/{id:[0-9]+}", userHandler.GetByID)
 			})
 
@@ -78,14 +91,12 @@ func main() {
 		r.Route("/admin", func(rt chi.Router) {
 			rt.Route("/organizer", func(route chi.Router) {
 				route.Get("/{id:[0-9]+}", organizerHandler.GetByID)
-				route.Post("/", organizerHandler.CreateOrganizer)
 				route.Put("/{id:[0-9]+}", organizerHandler.Update)
 				route.Delete("/{id:[0-9]+}", organizerHandler.Delete)
 			})
 
 			rt.Route("/user", func(route chi.Router) {
 				route.Get("/{id:[0-9]+}", userHandler.GetByID)
-				route.Post("/", userHandler.Create)
 				route.Put("/{id:[0-9]+}", userHandler.Update)
 				route.Delete("/{id:[0-9]+}", userHandler.Delete)
 			})
@@ -98,17 +109,16 @@ func main() {
 			})
 
 			rt.Route("/rundown", func(route chi.Router) {
-				route.Get("/{id:[0-9]+}", rundownHandler.GetByID)
 				route.Get("/{organizerId:[0-9]+}", rundownHandler.GetByOrganizerId)
 				route.Post("/", rundownHandler.Create)
-				route.Put("/{id:[0-9]+}", rundownHandler.Update)
+				route.Put("/", rundownHandler.Update)
 				route.Delete("/{id:[0-9]+}", rundownHandler.Delete)
 			})
 
 			rt.Route("/rundown_item", func(route chi.Router) {
 				route.Get("/{rundownId:[0-9]+}", rundownItemHandler.GetByRundownId)
 				route.Post("/", rundownItemHandler.Create)
-				route.Put("/{id:[0-9]+}", rundownItemHandler.Update)
+				route.Put("/", rundownItemHandler.Update)
 				route.Delete("/{id:[0-9]+}", rundownItemHandler.Delete)
 			})
 		})

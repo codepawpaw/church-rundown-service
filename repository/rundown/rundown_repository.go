@@ -45,28 +45,25 @@ func (o *RundownRepository) fetch(ctx context.Context, query string, args ...int
 	return payload, nil
 }
 
-func (o *RundownRepository) GetAll(ctx context.Context, num int64) ([]*models.Rundown, error) {
-	query := "Select id, title, subtitle, show_time, end_time, organizer_id From rundowns limit ?"
-
-	return o.fetch(ctx, query, num)
-}
-
-func (o *RundownRepository) Create(ctx context.Context, p *models.Rundown) (int64, error) {
+func (o *RundownRepository) Create(ctx context.Context, rundown *models.Rundown) (*models.Rundown, error) {
 	query := "Insert rundowns SET title=?, subtitle=?, show_time=?, end_time=?, organizer_id=?"
 
 	stmt, err := o.Connection.PrepareContext(ctx, query)
 	if err != nil {
-		return -1, err
+		return &models.Rundown{}, err
 	}
 
-	res, err := stmt.ExecContext(ctx, p.Title, p.Subtitle, p.ShowTime, p.EndTime, p.OrganizerId)
+	rundownResponse, err := stmt.ExecContext(ctx, rundown.Title, rundown.Subtitle, rundown.ShowTime, rundown.EndTime, rundown.OrganizerId)
 	defer stmt.Close()
 
 	if err != nil {
-		return -1, err
+		return &models.Rundown{}, err
 	}
 
-	return res.LastInsertId()
+	rundownId, _ := rundownResponse.LastInsertId()
+	rundown.ID = rundownId
+
+	return rundown, err
 }
 
 func (m *RundownRepository) GetByID(ctx context.Context, id int64) (*models.Rundown, error) {
@@ -102,24 +99,6 @@ func (m *RundownRepository) GetByOrganizerIdAndDate(ctx context.Context, organiz
 	query := "Select * From rundowns where organizer_id=? and show_time >= ? and end_time <= ?"
 
 	return m.fetch(ctx, query, organizerId, startDate, endDate)
-}
-
-func (m *RundownRepository) GetByOrganizerAndId(ctx context.Context, id int64, organizerId int64) (*models.Rundown, error) {
-	query := "Select * from rundowns where id=? AND organizer_id=?"
-	rows, err := m.fetch(ctx, query, id, organizerId)
-
-	if err != nil {
-		return nil, err
-	}
-
-	payload := &models.Rundown{}
-	if len(rows) > 0 {
-		payload = rows[0]
-	} else {
-		return nil, models.ErrNotFound
-	}
-
-	return payload, nil
 }
 
 func (m *RundownRepository) Update(ctx context.Context, p *models.Rundown) (*models.Rundown, error) {

@@ -8,5 +8,5 @@ type Rundown struct {
 	Subtitle    string    `json:subtitle`
 	ShowTime    time.Time `json:"showTime"`
 	EndTime     time.Time `json:"endTime"`
-	OrganizerId int64     `json:organizerId`
+	OrganizerId int64     `json:"organizerID"`
 }

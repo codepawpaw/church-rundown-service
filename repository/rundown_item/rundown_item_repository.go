@@ -44,28 +44,27 @@ func (o *RundownItemRepository) fetch(ctx context.Context, query string, args ..
 	return payload, nil
 }
 
-func (o *RundownItemRepository) GetAll(ctx context.Context, num int64) ([]*models.RundownItem, error) {
-	query := "Select id, title, subtitle, text, rundown_id From rundown_items limit ?"
-
-	return o.fetch(ctx, query, num)
-}
-
-func (o *RundownItemRepository) Create(ctx context.Context, p *models.RundownItem) (int64, error) {
+func (o *RundownItemRepository) Create(ctx context.Context, rundownItem *models.RundownItem) (*models.RundownItem, error) {
 	query := "Insert rundown_items SET title=?, subtitle=?, text=?, rundown_id=?"
 
 	stmt, err := o.Connection.PrepareContext(ctx, query)
 	if err != nil {
-		return -1, err
+		return &models.RundownItem{}, err
 	}
 
-	res, err := stmt.ExecContext(ctx, p.Title, p.Subtitle, p.Text, p.RundownId)
+	res, err := stmt.ExecContext(ctx, rundownItem.Title, rundownItem.Subtitle, rundownItem.Text, rundownItem.RundownId)
+
 	defer stmt.Close()
 
 	if err != nil {
-		return -1, err
+		return &models.RundownItem{}, err
 	}
 
-	return res.LastInsertId()
+	insertedId, _ := res.LastInsertId()
+
+	rundownItem.ID = insertedId
+
+	return rundownItem, err
 }
 
 func (m *RundownItemRepository) GetByRundownId(ctx context.Context, rundownId int64) ([]*models.RundownItem, error) {

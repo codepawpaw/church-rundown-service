@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -41,9 +40,15 @@ func (userHandler *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println(newId)
+	type Data struct {
+		InsertedId int64
+	}
 
-	respondwithJSON(w, http.StatusCreated, "Created")
+	data := Data{
+		InsertedId: newId,
+	}
+
+	respondwithJSON(w, http.StatusCreated, data)
 }
 
 func (userHandler *UserHandler) Update(w http.ResponseWriter, r *http.Request) {

@@ -5,23 +5,33 @@ import (
 	"net/http"
 
 	driver "../../driver"
+	dto "../../dto"
 	models "../../models"
 	repository "../../repository"
 	accountRepository "../../repository/account"
+	authRepository "../../repository/auth"
+	organizerRepository "../../repository/organizer"
+	userRepository "../../repository/user"
 	jwtService "../../service/jwt"
 	"github.com/dgrijalva/jwt-go"
 )
 
 func InitAuthHandler(db *driver.DB, jwtServiceObj *jwtService.JwtService) *AuthHandler {
 	return &AuthHandler{
-		accountRepository: accountRepository.InitAccountRepository(db.SQL),
-		jwtService:        jwtServiceObj,
+		accountRepository:   accountRepository.InitAccountRepository(db.SQL),
+		authRepository:      authRepository.InitAuthRepository(db.SQL),
+		userRepository:      userRepository.InitUserRepository(db.SQL),
+		organizerRepository: organizerRepository.InitOrganizerRepository(db.SQL),
+		jwtService:          jwtServiceObj,
 	}
 }
 
 type AuthHandler struct {
-	accountRepository repository.AccountRepository
-	jwtService        *jwtService.JwtService
+	accountRepository   repository.AccountRepository
+	authRepository      repository.AuthRepository
+	userRepository      repository.UserRepository
+	organizerRepository repository.OrganizerRepository
+	jwtService          *jwtService.JwtService
 }
 
 type Claims struct {
@@ -33,9 +43,9 @@ func (authHandler *AuthHandler) Login(response http.ResponseWriter, request *htt
 	account := models.Account{}
 	json.NewDecoder(request.Body).Decode(&account)
 
-	payload, err := authHandler.accountRepository.GetByUsernameAndPassword(request.Context(), string(account.Username), string(account.Password))
+	accountResponse, err := authHandler.accountRepository.GetByUsernameAndPassword(request.Context(), string(account.Username), string(account.Password))
 
-	if payload == nil {
+	if accountResponse == nil {
 		respondWithError(response, http.StatusUnauthorized, "Unauthorized")
 	}
 
@@ -43,27 +53,34 @@ func (authHandler *AuthHandler) Login(response http.ResponseWriter, request *htt
 		respondWithError(response, http.StatusUnauthorized, "Unauthorized")
 	}
 
-	generatedToken := authHandler.jwtService.Encode(account.Username)
+	userReponse, err := authHandler.userRepository.GetByID(request.Context(), accountResponse.UserId)
+	organizerResponse, _ := authHandler.organizerRepository.GetByID(request.Context(), userReponse.OrganizerId)
 
-	respondwithJSON(response, http.StatusOK, generatedToken)
+	generatedToken := authHandler.jwtService.Encode(accountResponse.Username)
+
+	authResponse := dto.Auth{
+		Account:   accountResponse,
+		User:      userReponse,
+		Organizer: organizerResponse,
+		Token:     generatedToken,
+	}
+
+	respondwithJSON(response, http.StatusOK, authResponse)
 }
 
 func (authHandler *AuthHandler) Register(response http.ResponseWriter, request *http.Request) {
-	account := models.Account{}
-	json.NewDecoder(request.Body).Decode(&account)
+	authModel := models.Auth{}
+	json.NewDecoder(request.Body).Decode(&authModel)
 
-	payload, err := authHandler.accountRepository.GetByUsername(request.Context(), string(account.Username))
+	organizer := authModel.Organizer
+	user := authModel.User
+	account := authModel.Account
 
-	if payload != nil {
-		respondWithError(response, http.StatusUnavailableForLegalReasons, "Username Already Exists")
-	}
-
-	if err != nil {
-	}
-
-	authHandler.accountRepository.Create(request.Context(), &account)
+	authResponse := authHandler.authRepository.Create(request.Context(), &organizer, &user, &account)
 
 	generatedToken := authHandler.jwtService.Encode(account.Username)
 
-	respondwithJSON(response, http.StatusOK, generatedToken)
+	authResponse.Token = generatedToken
+
+	respondwithJSON(response, http.StatusOK, authResponse)
 }

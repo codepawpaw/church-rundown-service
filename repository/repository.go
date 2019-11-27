@@ -3,6 +3,7 @@ package repsitory
 import (
 	"context"
 
+	dto "../dto"
 	models "../models"
 )
 
@@ -33,10 +34,8 @@ type AccountRepository interface {
 }
 
 type RundownRepository interface {
-	GetAll(ctx context.Context, num int64) ([]*models.Rundown, error)
-	Create(ctx context.Context, p *models.Rundown) (int64, error)
+	Create(ctx context.Context, p *models.Rundown) (*models.Rundown, error)
 	GetByID(ctx context.Context, id int64) (*models.Rundown, error)
-	GetByOrganizerAndId(ctx context.Context, id int64, organizerId int64) (*models.Rundown, error)
 	GetByOrganizerId(ctx context.Context, organizerId int64, startDate string, endDate string) ([]*models.Rundown, error)
 	GetByOrganizerIdAndDate(ctx context.Context, organizerId int64, startDate string, endDate string) ([]*models.Rundown, error)
 	Update(ctx context.Context, p *models.Rundown) (*models.Rundown, error)
@@ -44,9 +43,12 @@ type RundownRepository interface {
 }
 
 type RundownItemRepository interface {
-	GetAll(ctx context.Context, num int64) ([]*models.RundownItem, error)
-	Create(ctx context.Context, p *models.RundownItem) (int64, error)
+	Create(ctx context.Context, p *models.RundownItem) (*models.RundownItem, error)
 	GetByRundownId(ctx context.Context, rundownid int64) ([]*models.RundownItem, error)
 	Update(ctx context.Context, p *models.RundownItem) (*models.RundownItem, error)
 	Delete(ctx context.Context, id int64) (bool, error)
+}
+
+type AuthRepository interface {
+	Create(ctx context.Context, organizer *models.Organizer, user *models.User, account *models.Account) dto.Auth
 }

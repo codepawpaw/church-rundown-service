@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -23,62 +22,50 @@ type RundownItemHandler struct {
 	repository repository.RundownItemRepository
 }
 
-func (rundownItemHandler *RundownItemHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	payload, _ := rundownItemHandler.repository.GetAll(r.Context(), 100)
-
-	respondwithJSON(w, http.StatusOK, payload)
-}
-
-// Create a New Organizer
 func (rundownItemHandler *RundownItemHandler) Create(w http.ResponseWriter, r *http.Request) {
 	rundownItem := models.RundownItem{}
 	json.NewDecoder(r.Body).Decode(&rundownItem)
 
-	newId, err := rundownItemHandler.repository.Create(r.Context(), &rundownItem)
+	createdRundownItem, err := rundownItemHandler.repository.Create(r.Context(), &rundownItem)
 
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "500")
-		return
-	}
+	rundownResponse, _ := json.Marshal(createdRundownItem)
 
-	fmt.Println(newId)
+	response := construct(rundownResponse, err)
 
-	respondwithJSON(w, http.StatusCreated, "Created")
+	respondwithJSON(w, response.Status, response)
 }
 
 func (rundownItemHandler *RundownItemHandler) Update(w http.ResponseWriter, r *http.Request) {
-	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
-	rundownItem := models.RundownItem{ID: int64(id)}
+	rundownItem := models.RundownItem{}
 	json.NewDecoder(r.Body).Decode(&rundownItem)
-	payload, err := rundownItemHandler.repository.Update(r.Context(), &rundownItem)
 
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Server Error")
-	}
+	updatedRundownItem, err := rundownItemHandler.repository.Update(r.Context(), &rundownItem)
 
-	respondwithJSON(w, http.StatusOK, payload)
+	rundownResponse, _ := json.Marshal(updatedRundownItem)
+
+	response := construct(rundownResponse, err)
+
+	respondwithJSON(w, response.Status, response)
 }
 
-// GetByID returns a post details
 func (rundownItemHandler *RundownItemHandler) GetByRundownId(w http.ResponseWriter, r *http.Request) {
 	rundownId, _ := strconv.Atoi(chi.URLParam(r, "rundownId"))
-	payload, err := rundownItemHandler.repository.GetByRundownId(r.Context(), int64(rundownId))
+	selectedRundownItem, err := rundownItemHandler.repository.GetByRundownId(r.Context(), int64(rundownId))
 
-	if err != nil {
-		respondWithError(w, http.StatusNoContent, "Content not found")
-	}
+	rundownResponse, _ := json.Marshal(selectedRundownItem)
 
-	respondwithJSON(w, http.StatusOK, payload)
+	response := construct(rundownResponse, err)
+
+	respondwithJSON(w, response.Status, response)
 }
 
-// Delete a post
 func (rundownItemHandler *RundownItemHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	_, err := rundownItemHandler.repository.Delete(r.Context(), int64(id))
 
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Server Error")
-	}
+	rundownResponse, _ := json.Marshal("")
 
-	respondwithJSON(w, http.StatusMovedPermanently, map[string]string{"message": "Delete Successfully"})
+	response := construct(rundownResponse, err)
+
+	respondwithJSON(w, response.Status, response)
 }

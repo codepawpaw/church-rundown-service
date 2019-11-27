@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -43,7 +42,6 @@ func (organizerHandler *OrganizerHandler) GetAll(w http.ResponseWriter, r *http.
 	respondwithJSON(w, http.StatusOK, payload)
 }
 
-// Create a New Organizer
 func (organizerHandler *OrganizerHandler) CreateOrganizer(w http.ResponseWriter, r *http.Request) {
 	organizer := models.Organizer{}
 	json.NewDecoder(r.Body).Decode(&organizer)
@@ -55,9 +53,15 @@ func (organizerHandler *OrganizerHandler) CreateOrganizer(w http.ResponseWriter,
 		return
 	}
 
-	fmt.Println(newId)
+	type Data struct {
+		InsertedId int64
+	}
 
-	respondwithJSON(w, http.StatusCreated, "Created")
+	data := Data{
+		InsertedId: newId,
+	}
+
+	respondwithJSON(w, http.StatusCreated, data)
 }
 
 func (organizerHandler *OrganizerHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -73,7 +77,6 @@ func (organizerHandler *OrganizerHandler) Update(w http.ResponseWriter, r *http.
 	respondwithJSON(w, http.StatusOK, payload)
 }
 
-// GetByID returns a post details
 func (organizerHandler *OrganizerHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	payload, err := organizerHandler.repository.GetByID(r.Context(), int64(id))
@@ -85,7 +88,6 @@ func (organizerHandler *OrganizerHandler) GetByID(w http.ResponseWriter, r *http
 	respondwithJSON(w, http.StatusOK, payload)
 }
 
-// Delete a post
 func (organizerHandler *OrganizerHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	_, err := organizerHandler.repository.Delete(r.Context(), int64(id))

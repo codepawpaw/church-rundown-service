@@ -58,7 +58,6 @@ func (accountHandler *AccountHandler) Update(w http.ResponseWriter, r *http.Requ
 	respondwithJSON(w, http.StatusOK, payload)
 }
 
-// GetByID returns a post details
 func (accountHandler *AccountHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	payload, err := accountHandler.repository.GetByID(r.Context(), int64(id))
@@ -70,7 +69,6 @@ func (accountHandler *AccountHandler) GetByID(w http.ResponseWriter, r *http.Req
 	respondwithJSON(w, http.StatusOK, payload)
 }
 
-// Delete a post
 func (accountHandler *AccountHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	_, err := accountHandler.repository.Delete(r.Context(), int64(id))
