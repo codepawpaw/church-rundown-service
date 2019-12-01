@@ -27,7 +27,7 @@ func (rundownItemHandler *RundownItemHandler) Create(w http.ResponseWriter, r *h
 	json.NewDecoder(r.Body).Decode(&rundownItem)
 
 	createdRundownItem, err := rundownItemHandler.repository.Create(r.Context(), &rundownItem)
-
+	
 	rundownResponse, _ := json.Marshal(createdRundownItem)
 
 	response := construct(rundownResponse, err)

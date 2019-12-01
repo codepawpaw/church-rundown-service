@@ -47,6 +47,7 @@ type RundownItemRepository interface {
 	GetByRundownId(ctx context.Context, rundownid int64) ([]*models.RundownItem, error)
 	Update(ctx context.Context, p *models.RundownItem) (*models.RundownItem, error)
 	Delete(ctx context.Context, id int64) (bool, error)
+	DeleteByRundownId(ctx context.Context, rundownId int64) (bool, error)
 }
 
 type AuthRepository interface {

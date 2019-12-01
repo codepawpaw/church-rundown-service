@@ -10,17 +10,20 @@ import (
 	models "../../models"
 	repository "../../repository"
 	rundownRepository "../../repository/rundown"
+	rundownItemRepository "../../repository/rundown_item"
 	"github.com/go-chi/chi"
 )
 
 func InitRundownHandler(db *driver.DB) *RundownHandler {
 	return &RundownHandler{
-		repository: rundownRepository.InitRundownRepository(db.SQL),
+		repository:            rundownRepository.InitRundownRepository(db.SQL),
+		rundownItemRepository: rundownItemRepository.InitRundownItemRepository(db.SQL),
 	}
 }
 
 type RundownHandler struct {
-	repository repository.RundownRepository
+	repository            repository.RundownRepository
+	rundownItemRepository repository.RundownItemRepository
 }
 
 type RundownHttpResponse struct {
@@ -95,6 +98,13 @@ func (rundownHandler *RundownHandler) GetByOrganizerId(w http.ResponseWriter, r 
 
 func (rundownHandler *RundownHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
+
+	isDeleteSuccess, _ := rundownHandler.rundownItemRepository.DeleteByRundownId(r.Context(), int64(id))
+
+	if isDeleteSuccess == false {
+		respondwithJSON(w, http.StatusInternalServerError, "Failed to delete rundown item")
+	}
+
 	payload, err := rundownHandler.repository.Delete(r.Context(), int64(id))
 
 	rundownResponse, _ := json.Marshal(payload)
@@ -102,4 +112,5 @@ func (rundownHandler *RundownHandler) Delete(w http.ResponseWriter, r *http.Requ
 	response := construct(rundownResponse, err)
 
 	respondwithJSON(w, response.Status, response)
+
 }

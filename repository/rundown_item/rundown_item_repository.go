@@ -108,3 +108,17 @@ func (m *RundownItemRepository) Delete(ctx context.Context, id int64) (bool, err
 	}
 	return true, nil
 }
+
+func (m *RundownItemRepository) DeleteByRundownId(ctx context.Context, rundownId int64) (bool, error) {
+	query := "Delete From rundown_items Where rundown_id=?"
+
+	stmt, err := m.Connection.PrepareContext(ctx, query)
+	if err != nil {
+		return false, err
+	}
+	_, err = stmt.ExecContext(ctx, rundownId)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
