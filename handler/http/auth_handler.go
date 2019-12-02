@@ -65,7 +65,11 @@ func (authHandler *AuthHandler) Login(response http.ResponseWriter, request *htt
 		Token:     generatedToken,
 	}
 
-	respondwithJSON(response, http.StatusOK, authResponse)
+	authResponseJson, _ := json.Marshal(authResponse)
+
+	responseJson := construct(authResponseJson, err)
+
+	respondwithJSON(response, responseJson.Status, responseJson)
 }
 
 func (authHandler *AuthHandler) Register(response http.ResponseWriter, request *http.Request) {
@@ -82,5 +86,9 @@ func (authHandler *AuthHandler) Register(response http.ResponseWriter, request *
 
 	authResponse.Token = generatedToken
 
-	respondwithJSON(response, http.StatusOK, authResponse)
+	authResponseJson, err := json.Marshal(authResponse)
+
+	responseJson := construct(authResponseJson, err)
+
+	respondwithJSON(response, responseJson.Status, responseJson)
 }
