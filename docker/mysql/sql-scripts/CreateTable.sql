@@ -6,7 +6,7 @@ content varchar(35)
 
 CREATE TABLE organizers (
 id int PRIMARY KEY AUTO_INCREMENT,
-name varchar(35),
+name varchar(35) NOT NULL UNIQUE,
 description varchar(35)
 );
 
@@ -19,8 +19,8 @@ FOREIGN KEY (organizer_id) REFERENCES organizers(id)
 
 CREATE TABLE accounts (
 id int PRIMARY KEY AUTO_INCREMENT,
-username varchar(30),
-password varchar(30),
+username varchar(30) NOT NULL UNIQUE,
+password varchar(30) NOT NULL,
 user_id int,
 FOREIGN KEY (user_id) REFERENCES users(id)
 );

@@ -69,11 +69,11 @@ func (userHandler *UserHandler) GetByID(w http.ResponseWriter, r *http.Request) 
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	payload, err := userHandler.repository.GetByID(r.Context(), int64(id))
 
-	if err != nil {
-		respondWithError(w, http.StatusNoContent, "Content not found")
-	}
+	userResponse, _ := json.Marshal(payload)
 
-	respondwithJSON(w, http.StatusOK, payload)
+	response := construct(userResponse, err)
+
+	respondwithJSON(w, response.Status, response)
 }
 
 // Delete a post

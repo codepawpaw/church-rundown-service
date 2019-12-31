@@ -80,13 +80,30 @@ func (authHandler *AuthHandler) Register(response http.ResponseWriter, request *
 	user := authModel.User
 	account := authModel.Account
 
-	authResponse := authHandler.authRepository.Create(request.Context(), &organizer, &user, &account)
+	authResponse, err := authHandler.authRepository.Create(request.Context(), &organizer, &user, &account)
 
 	generatedToken := authHandler.jwtService.Encode(account.Username)
 
 	authResponse.Token = generatedToken
 
-	authResponseJson, err := json.Marshal(authResponse)
+	authResponseJson, _ := json.Marshal(authResponse)
+
+	responseJson := construct(authResponseJson, err)
+
+	respondwithJSON(response, responseJson.Status, responseJson)
+}
+
+func (authHandler *AuthHandler) Update(response http.ResponseWriter, request *http.Request) {
+	authModel := models.Auth{}
+	json.NewDecoder(request.Body).Decode(&authModel)
+
+	organizer := authModel.Organizer
+	user := authModel.User
+	account := authModel.Account
+
+	authResponse, err := authHandler.authRepository.Update(request.Context(), &organizer, &user, &account)
+
+	authResponseJson, _ := json.Marshal(authResponse)
 
 	responseJson := construct(authResponseJson, err)
 

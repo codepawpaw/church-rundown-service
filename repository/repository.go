@@ -11,6 +11,7 @@ type OrganizerRepository interface {
 	GetAll(ctx context.Context, num int64, id string, name string) ([]*models.Organizer, error)
 	Create(ctx context.Context, p *models.Organizer) (int64, error)
 	GetByID(ctx context.Context, id int64) (*models.Organizer, error)
+	GetByName(ctx context.Context, name string) ([]*models.Organizer, error)
 	Update(ctx context.Context, p *models.Organizer) (*models.Organizer, error)
 	Delete(ctx context.Context, id int64) (bool, error)
 }
@@ -51,5 +52,6 @@ type RundownItemRepository interface {
 }
 
 type AuthRepository interface {
-	Create(ctx context.Context, organizer *models.Organizer, user *models.User, account *models.Account) dto.Auth
+	Create(ctx context.Context, organizer *models.Organizer, user *models.User, account *models.Account) (dto.Auth, error)
+	Update(ctx context.Context, organizer *models.Organizer, user *models.User, account *models.Account) (dto.Auth, error)
 }

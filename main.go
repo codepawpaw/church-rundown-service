@@ -55,17 +55,11 @@ func main() {
 		r.Route("/public", func(rt chi.Router) {
 			rt.Route("/organizer", func(route chi.Router) {
 				route.Post("/", organizerHandler.CreateOrganizer)
-				route.Get("/", organizerHandler.GetAll)
-				route.Get("/{id:[0-9]+}", organizerHandler.GetByID)
+				route.Get("/{name}", organizerHandler.GetByName)
 			})
 
 			rt.Route("/user", func(route chi.Router) {
 				route.Post("/", userHandler.Create)
-				route.Get("/{id:[0-9]+}", userHandler.GetByID)
-			})
-
-			rt.Route("/account", func(route chi.Router) {
-				route.Get("/{id:[0-9]+}", accountHandler.GetByID)
 			})
 
 			rt.Route("/rundown", func(route chi.Router) {
@@ -89,16 +83,20 @@ func main() {
 		r.Use(jwtServiceObj.Authenticator())
 
 		r.Route("/admin", func(rt chi.Router) {
+			rt.Route("/auth", func(route chi.Router) {
+				route.Post("/update", authHandler.Update)
+			})
+
 			rt.Route("/organizer", func(route chi.Router) {
-				route.Get("/{id:[0-9]+}", organizerHandler.GetByID)
 				route.Put("/{id:[0-9]+}", organizerHandler.Update)
+				route.Get("/getById/{id:[0-9]+}", organizerHandler.GetByID)
 				route.Delete("/{id:[0-9]+}", organizerHandler.Delete)
 			})
 
 			rt.Route("/user", func(route chi.Router) {
-				route.Get("/{id:[0-9]+}", userHandler.GetByID)
 				route.Put("/{id:[0-9]+}", userHandler.Update)
 				route.Delete("/{id:[0-9]+}", userHandler.Delete)
+				route.Get("/{id:[0-9]+}", userHandler.GetByID)
 			})
 
 			rt.Route("/account", func(route chi.Router) {

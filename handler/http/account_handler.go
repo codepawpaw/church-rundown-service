@@ -62,11 +62,11 @@ func (accountHandler *AccountHandler) GetByID(w http.ResponseWriter, r *http.Req
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	payload, err := accountHandler.repository.GetByID(r.Context(), int64(id))
 
-	if err != nil {
-		respondWithError(w, http.StatusNoContent, "Content not found")
-	}
+	accountResponse, _ := json.Marshal(payload)
 
-	respondwithJSON(w, http.StatusOK, payload)
+	response := construct(accountResponse, err)
+
+	respondwithJSON(w, response.Status, response)
 }
 
 func (accountHandler *AccountHandler) Delete(w http.ResponseWriter, r *http.Request) {
