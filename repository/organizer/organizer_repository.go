@@ -106,9 +106,9 @@ func (m *OrganizerRepository) GetByID(ctx context.Context, id int64) (*models.Or
 }
 
 func (m *OrganizerRepository) GetByName(ctx context.Context, name string) ([]*models.Organizer, error) {
-	query := "Select id, name, description From organizers where name like ?"
+	query := "Select id, name, description From organizers where name LIKE '" + "%" + name + "%" + "'"
 
-	return m.fetch(ctx, query, name)
+	return m.fetch(ctx, query)
 }
 
 func (m *OrganizerRepository) Update(ctx context.Context, p *models.Organizer) (*models.Organizer, error) {
