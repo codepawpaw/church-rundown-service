@@ -88,9 +88,11 @@ func (m *RundownRepository) GetByOrganizerId(ctx context.Context, organizerId in
 	query := "Select * From rundowns where organizer_id=?"
 
 	if startDate != "" && endDate != "" {
-		query = query + " AND show_time >= ? AND end_time <= ?"
+		query = query + " AND show_time >= ? AND end_time <= ? ORDER BY show_time DESC"
 		return m.fetch(ctx, query, organizerId, startDate, endDate)
 	}
+
+	query = query + " ORDER BY show_time DESC"
 
 	return m.fetch(ctx, query, organizerId)
 }
