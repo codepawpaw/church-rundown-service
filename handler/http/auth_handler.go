@@ -45,30 +45,35 @@ func (authHandler *AuthHandler) Login(response http.ResponseWriter, request *htt
 
 	accountResponse, err := authHandler.accountRepository.GetByUsernameAndPassword(request.Context(), string(account.Username), string(account.Password))
 
-	if accountResponse == nil {
-		respondWithError(response, http.StatusUnauthorized, "Unauthorized")
+	emptyAuthResponse := dto.Auth{}
+	authResponseJson, _ := json.Marshal(emptyAuthResponse)
+	errorMessage := ""
+
+	if accountResponse == nil || err != nil {
+		errorMessage = "Incorrect username or password"
+	} else {
+		userReponse, err := authHandler.userRepository.GetByID(request.Context(), accountResponse.UserId)
+
+		if err != nil {
+			errorMessage = err.Error()
+		}
+
+		organizerResponse, _ := authHandler.organizerRepository.GetByID(request.Context(), userReponse.OrganizerId)
+
+		generatedToken := authHandler.jwtService.Encode(accountResponse.Username)
+
+		authResponse := dto.Auth{
+			Account:   accountResponse,
+			User:      userReponse,
+			Organizer: organizerResponse,
+			Token:     generatedToken,
+		}
+
+		json, _ := json.Marshal(authResponse)
+		authResponseJson = json
 	}
 
-	if err != nil {
-		respondWithError(response, http.StatusUnauthorized, "Unauthorized")
-	}
-
-	userReponse, err := authHandler.userRepository.GetByID(request.Context(), accountResponse.UserId)
-	organizerResponse, _ := authHandler.organizerRepository.GetByID(request.Context(), userReponse.OrganizerId)
-
-	generatedToken := authHandler.jwtService.Encode(accountResponse.Username)
-
-	authResponse := dto.Auth{
-		Account:   accountResponse,
-		User:      userReponse,
-		Organizer: organizerResponse,
-		Token:     generatedToken,
-	}
-
-	authResponseJson, _ := json.Marshal(authResponse)
-
-	responseJson := construct(authResponseJson, err)
-
+	responseJson := constructResponse(authResponseJson, errorMessage)
 	respondwithJSON(response, responseJson.Status, responseJson)
 }
 
