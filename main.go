@@ -54,12 +54,7 @@ func main() {
 	r.Group(func(r chi.Router) {
 		r.Route("/public", func(rt chi.Router) {
 			rt.Route("/organizer", func(route chi.Router) {
-				route.Post("/", organizerHandler.CreateOrganizer)
 				route.Get("/{name}", organizerHandler.GetByName)
-			})
-
-			rt.Route("/user", func(route chi.Router) {
-				route.Post("/", userHandler.Create)
 			})
 
 			rt.Route("/rundown", func(route chi.Router) {
@@ -88,22 +83,16 @@ func main() {
 			})
 
 			rt.Route("/organizer", func(route chi.Router) {
-				route.Put("/{id:[0-9]+}", organizerHandler.Update)
 				route.Get("/getById/{id:[0-9]+}", organizerHandler.GetByID)
-				route.Delete("/{id:[0-9]+}", organizerHandler.Delete)
 			})
 
 			rt.Route("/user", func(route chi.Router) {
-				route.Put("/{id:[0-9]+}", userHandler.Update)
-				route.Delete("/{id:[0-9]+}", userHandler.Delete)
 				route.Get("/{id:[0-9]+}", userHandler.GetByID)
 			})
 
 			rt.Route("/account", func(route chi.Router) {
 				route.Get("/{id:[0-9]+}", accountHandler.GetByID)
-				route.Post("/", accountHandler.Create)
 				route.Put("/{id:[0-9]+}", accountHandler.Update)
-				route.Delete("/{id:[0-9]+}", accountHandler.Delete)
 			})
 
 			rt.Route("/rundown", func(route chi.Router) {

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -21,28 +20,6 @@ func InitAccountHandler(db *driver.DB) *AccountHandler {
 
 type AccountHandler struct {
 	repository repository.AccountRepository
-}
-
-func (accountHandler *AccountHandler) GetAll(w http.ResponseWriter, r *http.Request) {
-	payload, _ := accountHandler.repository.GetAll(r.Context(), 100)
-
-	respondwithJSON(w, http.StatusOK, payload)
-}
-
-func (accountHandler *AccountHandler) Create(w http.ResponseWriter, r *http.Request) {
-	account := models.Account{}
-	json.NewDecoder(r.Body).Decode(&account)
-
-	newId, err := accountHandler.repository.Create(r.Context(), &account)
-
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "500")
-		return
-	}
-
-	fmt.Println(newId)
-
-	respondwithJSON(w, http.StatusCreated, "Created")
 }
 
 func (accountHandler *AccountHandler) Update(w http.ResponseWriter, r *http.Request) {
@@ -67,17 +44,6 @@ func (accountHandler *AccountHandler) GetByID(w http.ResponseWriter, r *http.Req
 	response := construct(accountResponse, err)
 
 	respondwithJSON(w, response.Status, response)
-}
-
-func (accountHandler *AccountHandler) Delete(w http.ResponseWriter, r *http.Request) {
-	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
-	_, err := accountHandler.repository.Delete(r.Context(), int64(id))
-
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Server Error")
-	}
-
-	respondwithJSON(w, http.StatusMovedPermanently, map[string]string{"message": "Delete Successfully"})
 }
 
 func respondwithJSON(w http.ResponseWriter, code int, payload interface{}) {

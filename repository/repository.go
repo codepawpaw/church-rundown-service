@@ -8,30 +8,18 @@ import (
 )
 
 type OrganizerRepository interface {
-	GetAll(ctx context.Context, num int64, id string, name string) ([]*models.Organizer, error)
-	Create(ctx context.Context, p *models.Organizer) (int64, error)
 	GetByID(ctx context.Context, id int64) (*models.Organizer, error)
 	GetByName(ctx context.Context, name string) ([]*models.Organizer, error)
-	Update(ctx context.Context, p *models.Organizer) (*models.Organizer, error)
-	Delete(ctx context.Context, id int64) (bool, error)
 }
 
 type UserRepository interface {
-	GetAll(ctx context.Context, num int64) ([]*models.User, error)
-	Create(ctx context.Context, p *models.User) (int64, error)
 	GetByID(ctx context.Context, id int64) (*models.User, error)
-	Update(ctx context.Context, p *models.User) (*models.User, error)
-	Delete(ctx context.Context, id int64) (bool, error)
 }
 
 type AccountRepository interface {
-	GetAll(ctx context.Context, num int64) ([]*models.Account, error)
-	Create(ctx context.Context, p *models.Account) (int64, error)
 	GetByID(ctx context.Context, id int64) (*models.Account, error)
 	GetByUsernameAndPassword(ctx context.Context, username string, password string) (*models.Account, error)
-	GetByUsername(ctx context.Context, username string) (*models.Account, error)
 	Update(ctx context.Context, p *models.Account) (*models.Account, error)
-	Delete(ctx context.Context, id int64) (bool, error)
 }
 
 type RundownRepository interface {

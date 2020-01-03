@@ -42,31 +42,6 @@ func (o *UserRepository) fetch(ctx context.Context, query string, args ...interf
 	return payload, nil
 }
 
-func (o *UserRepository) GetAll(ctx context.Context, num int64) ([]*models.User, error) {
-	query := "Select id, name, organizer_id From users limit ?"
-
-	return o.fetch(ctx, query, num)
-}
-
-func (o *UserRepository) Create(ctx context.Context, p *models.User) (int64, error) {
-	query := "Insert users SET name=?, organizer_id=?"
-
-	stmt, err := o.Connection.PrepareContext(ctx, query)
-
-	if err != nil {
-		return -1, err
-	}
-
-	res, err := stmt.ExecContext(ctx, p.Name, p.OrganizerId)
-	defer stmt.Close()
-
-	if err != nil {
-		return -1, err
-	}
-
-	return res.LastInsertId()
-}
-
 func (m *UserRepository) GetByID(ctx context.Context, id int64) (*models.User, error) {
 	query := "Select id, name, organizer_id From users where id=?"
 
@@ -83,38 +58,4 @@ func (m *UserRepository) GetByID(ctx context.Context, id int64) (*models.User, e
 	}
 
 	return payload, nil
-}
-
-func (m *UserRepository) Update(ctx context.Context, p *models.User) (*models.User, error) {
-	query := "Update users set name=? where id=?"
-
-	stmt, err := m.Connection.PrepareContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	_, err = stmt.ExecContext(
-		ctx,
-		p.Name,
-		p.ID,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	return p, nil
-}
-
-func (m *UserRepository) Delete(ctx context.Context, id int64) (bool, error) {
-	query := "Delete From users Where id=?"
-
-	stmt, err := m.Connection.PrepareContext(ctx, query)
-	if err != nil {
-		return false, err
-	}
-	_, err = stmt.ExecContext(ctx, id)
-	if err != nil {
-		return false, err
-	}
-	return true, nil
 }
