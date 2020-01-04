@@ -92,7 +92,6 @@ func main() {
 
 			rt.Route("/account", func(route chi.Router) {
 				route.Get("/{id:[0-9]+}", accountHandler.GetByID)
-				route.Put("/{id:[0-9]+}", accountHandler.Update)
 			})
 
 			rt.Route("/rundown", func(route chi.Router) {

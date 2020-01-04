@@ -78,24 +78,3 @@ func (m *AccountRepository) GetByUsernameAndPassword(ctx context.Context, userna
 
 	return payload, nil
 }
-
-func (m *AccountRepository) Update(ctx context.Context, p *models.Account) (*models.Account, error) {
-	query := "Update accounts set username=?, password=? where id=?"
-
-	stmt, err := m.Connection.PrepareContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	_, err = stmt.ExecContext(
-		ctx,
-		p.Username,
-		p.Password,
-		p.ID,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	return p, nil
-}

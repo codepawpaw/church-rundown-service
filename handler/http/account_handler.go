@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	driver "../../driver"
-	models "../../models"
 	repository "../../repository"
 	accountRepository "../../repository/account"
 	"github.com/go-chi/chi"
@@ -20,19 +19,6 @@ func InitAccountHandler(db *driver.DB) *AccountHandler {
 
 type AccountHandler struct {
 	repository repository.AccountRepository
-}
-
-func (accountHandler *AccountHandler) Update(w http.ResponseWriter, r *http.Request) {
-	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
-	account := models.Account{ID: int64(id)}
-	json.NewDecoder(r.Body).Decode(&account)
-	payload, err := accountHandler.repository.Update(r.Context(), &account)
-
-	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Server Error")
-	}
-
-	respondwithJSON(w, http.StatusOK, payload)
 }
 
 func (accountHandler *AccountHandler) GetByID(w http.ResponseWriter, r *http.Request) {

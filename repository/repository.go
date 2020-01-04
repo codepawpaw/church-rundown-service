@@ -19,7 +19,6 @@ type UserRepository interface {
 type AccountRepository interface {
 	GetByID(ctx context.Context, id int64) (*models.Account, error)
 	GetByUsernameAndPassword(ctx context.Context, username string, password string) (*models.Account, error)
-	Update(ctx context.Context, p *models.Account) (*models.Account, error)
 }
 
 type RundownRepository interface {
