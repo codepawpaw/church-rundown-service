@@ -27,8 +27,8 @@ FOREIGN KEY (user_id) REFERENCES users(id)
 
 CREATE TABLE rundowns (
 id int PRIMARY KEY AUTO_INCREMENT,
-title varchar(50),
-subtitle varchar(100),
+title varchar(600),
+subtitle varchar(600),
 show_time datetime,
 end_time datetime,
 organizer_id int,
@@ -37,9 +37,9 @@ FOREIGN KEY (organizer_id) REFERENCES organizers(id)
 
 CREATE TABLE rundown_items (
 id int PRIMARY KEY AUTO_INCREMENT,
-title varchar(35),
-subtitle varchar(40),
-text varchar(1000),
+title text,
+subtitle text,
+text text,
 rundown_id int,
 FOREIGN KEY (rundown_id) REFERENCES rundowns(id)
 );
