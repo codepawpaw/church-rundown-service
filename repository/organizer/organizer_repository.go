@@ -61,7 +61,7 @@ func (m *OrganizerRepository) GetByID(ctx context.Context, id int64) (*models.Or
 }
 
 func (m *OrganizerRepository) GetByName(ctx context.Context, name string) ([]*models.Organizer, error) {
-	query := "Select id, name, description From organizers where name LIKE '" + "%" + name + "%" + "'"
+	query := "Select id, name, description, location_name, location_lat, location_lng From organizers where name LIKE '" + "%" + name + "%" + "'"
 
 	return m.fetch(ctx, query)
 }

@@ -21,7 +21,7 @@ type AuthRepository struct {
 }
 
 func (o *AuthRepository) Create(ctx context.Context, organizer *models.Organizer, user *models.User, account *models.Account) (dto.Auth, error) {
-	organizerQuery := "Insert organizers SET name=?, description=?"
+	organizerQuery := "Insert organizers SET name=?, description=?, location_name=?, location_lat=?, location_lng=?"
 	userQuery := "Insert users SET name=?, organizer_id=?"
 	accountQuery := "Insert accounts SET username=?, password=?, user_id=?"
 
@@ -38,7 +38,7 @@ func (o *AuthRepository) Create(ctx context.Context, organizer *models.Organizer
 		return emptyAuthResponse, err
 	}
 
-	organizerResponse, err := organizerStatement.ExecContext(ctx, organizer.Name, organizer.Description)
+	organizerResponse, err := organizerStatement.ExecContext(ctx, organizer.Name, organizer.Description, organizer.LocationName, organizer.LocationLat, organizer.LocationLng)
 	defer organizerStatement.Close()
 	if err != nil {
 		tx.Rollback()
