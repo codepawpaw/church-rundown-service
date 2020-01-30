@@ -10,7 +10,8 @@ name varchar(35) NOT NULL UNIQUE,
 description varchar(35),
 location_name varchar(300) NOT NULL,
 location_lat varchar(100) NOT NULL,
-location_lng varchar(100) NOT NULL
+location_lng varchar(100) NOT NULL,
+location_address varchar(200) NOT NULL
 );
 
 CREATE TABLE users (
