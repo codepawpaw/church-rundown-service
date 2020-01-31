@@ -32,6 +32,7 @@ func (o *OrganizerRepository) fetch(ctx context.Context, query string, args ...i
 		err := rows.Scan(
 			&data.ID,
 			&data.Name,
+			&data.DisplayName,
 			&data.Description,
 			&data.LocationName,
 			&data.LocationLat,

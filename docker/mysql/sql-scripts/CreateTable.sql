@@ -7,6 +7,7 @@ content varchar(35)
 CREATE TABLE organizers (
 id int PRIMARY KEY AUTO_INCREMENT,
 name varchar(300) NOT NULL UNIQUE,
+display_name varchar(300) NOT NULL UNIQUE,
 description varchar(35),
 location_name varchar(300) NOT NULL,
 location_lat varchar(100) NOT NULL,
