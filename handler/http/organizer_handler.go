@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -39,6 +40,9 @@ func (organizerHandler *OrganizerHandler) GetByName(w http.ResponseWriter, r *ht
 	if err != nil {
 		respondWithError(w, http.StatusNoContent, "Content not found")
 	}
+
+	fmt.Println("payload =====")
+	fmt.Println(payload)
 
 	respondwithJSON(w, http.StatusOK, payload)
 }
