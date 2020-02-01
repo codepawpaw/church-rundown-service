@@ -55,6 +55,7 @@ func main() {
 		r.Route("/public", func(rt chi.Router) {
 			rt.Route("/organizer", func(route chi.Router) {
 				route.Get("/{name}", organizerHandler.GetByName)
+				route.Get("/city/{name}", organizerHandler.GetByCity)
 			})
 
 			rt.Route("/rundown", func(route chi.Router) {

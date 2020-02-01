@@ -38,6 +38,8 @@ func (o *OrganizerRepository) fetch(ctx context.Context, query string, args ...i
 			&data.LocationLat,
 			&data.LocationLng,
 			&data.LocationAddress,
+			&data.City,
+			&data.Nation,
 		)
 
 		if err != nil {
@@ -68,6 +70,12 @@ func (m *OrganizerRepository) GetByID(ctx context.Context, id int64) (*models.Or
 
 func (m *OrganizerRepository) GetByName(ctx context.Context, name string) ([]*models.Organizer, error) {
 	query := "Select * From organizers where name LIKE '" + "%" + name + "%" + "' or display_name LIKE '" + "%" + name + "%" + "'"
+
+	return m.fetch(ctx, query)
+}
+
+func (m *OrganizerRepository) GetByCity(ctx context.Context, city string) ([]*models.Organizer, error) {
+	query := "Select * From organizers where city LIKE '" + "%" + city + "%" + "'"
 
 	return m.fetch(ctx, query)
 }

@@ -42,3 +42,14 @@ func (organizerHandler *OrganizerHandler) GetByName(w http.ResponseWriter, r *ht
 
 	respondwithJSON(w, http.StatusOK, payload)
 }
+
+func (organizerHandler *OrganizerHandler) GetByCity(w http.ResponseWriter, r *http.Request) {
+	city := chi.URLParam(r, "city")
+	payload, err := organizerHandler.repository.GetByCity(r.Context(), string(city))
+
+	if err != nil {
+		respondWithError(w, http.StatusNoContent, "Content not found")
+	}
+
+	respondwithJSON(w, http.StatusOK, payload)
+}

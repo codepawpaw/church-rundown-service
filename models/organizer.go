@@ -9,4 +9,6 @@ type Organizer struct {
 	LocationLat     string `json:"locationLat"`
 	LocationLng     string `json:"locationLng"`
 	LocationAddress string `json:"locationAddress"`
+	City            string `json:"city"`
+	Nation          string `json:"nation"`
 }
