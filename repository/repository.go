@@ -11,6 +11,7 @@ type OrganizerRepository interface {
 	GetByID(ctx context.Context, id int64) (*models.Organizer, error)
 	GetByName(ctx context.Context, name string) ([]*models.Organizer, error)
 	GetByCity(ctx context.Context, city string) ([]*models.Organizer, error)
+	GetByProvince(ctx context.Context, province string) ([]*models.Organizer, error)
 }
 
 type UserRepository interface {

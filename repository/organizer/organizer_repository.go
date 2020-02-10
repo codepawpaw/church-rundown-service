@@ -79,3 +79,9 @@ func (m *OrganizerRepository) GetByCity(ctx context.Context, city string) ([]*mo
 
 	return m.fetch(ctx, query)
 }
+
+func (m *OrganizerRepository) GetByProvince(ctx context.Context, province string) ([]*models.Organizer, error) {
+	query := "Select * From organizers where province LIKE '" + "%" + province + "%" + "'"
+
+	return m.fetch(ctx, query)
+}
