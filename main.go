@@ -57,6 +57,7 @@ func main() {
 				route.Get("/{name}", organizerHandler.GetByName)
 				route.Get("/city/{name}", organizerHandler.GetByCity)
 				route.Get("/province/{name}", organizerHandler.GetByProvince)
+				route.Get("/province/name/{province}/{name}", organizerHandler.GetByProvinceAndName)
 			})
 
 			rt.Route("/rundown", func(route chi.Router) {

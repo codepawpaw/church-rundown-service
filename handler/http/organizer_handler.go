@@ -55,8 +55,20 @@ func (organizerHandler *OrganizerHandler) GetByCity(w http.ResponseWriter, r *ht
 }
 
 func (organizerHandler *OrganizerHandler) GetByProvince(w http.ResponseWriter, r *http.Request) {
-	province := chi.URLParam(r, "province")
+	province := chi.URLParam(r, "name")
 	payload, err := organizerHandler.repository.GetByProvince(r.Context(), string(province))
+
+	if err != nil {
+		respondWithError(w, http.StatusNoContent, "Content not found")
+	}
+
+	respondwithJSON(w, http.StatusOK, payload)
+}
+
+func (organizerHandler *OrganizerHandler) GetByProvinceAndName(w http.ResponseWriter, r *http.Request) {
+	province := chi.URLParam(r, "province")
+	name := chi.URLParam(r, "name")
+	payload, err := organizerHandler.repository.GetByProvinceAndName(r.Context(), string(province), string(name))
 
 	if err != nil {
 		respondWithError(w, http.StatusNoContent, "Content not found")

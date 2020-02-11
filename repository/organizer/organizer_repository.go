@@ -39,6 +39,7 @@ func (o *OrganizerRepository) fetch(ctx context.Context, query string, args ...i
 			&data.LocationLng,
 			&data.LocationAddress,
 			&data.City,
+			&data.Province,
 			&data.Nation,
 		)
 
@@ -82,6 +83,12 @@ func (m *OrganizerRepository) GetByCity(ctx context.Context, city string) ([]*mo
 
 func (m *OrganizerRepository) GetByProvince(ctx context.Context, province string) ([]*models.Organizer, error) {
 	query := "Select * From organizers where province LIKE '" + "%" + province + "%" + "'"
+
+	return m.fetch(ctx, query)
+}
+
+func (m *OrganizerRepository) GetByProvinceAndName(ctx context.Context, province string, churchName string) ([]*models.Organizer, error) {
+	query := "Select * From organizers where province LIKE '" + "%" + province + "%" + "' AND (name LIKE '" + "%" + churchName + "%" + "'" + " or display_name LIKE '" + "%" + churchName + "%" + "')"
 
 	return m.fetch(ctx, query)
 }
