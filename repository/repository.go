@@ -45,3 +45,31 @@ type AuthRepository interface {
 	Create(ctx context.Context, organizer *models.Organizer, user *models.User, account *models.Account) (dto.Auth, error)
 	Update(ctx context.Context, organizer *models.Organizer, user *models.User, account *models.Account) (dto.Auth, error)
 }
+
+type ConcregationRepository interface {
+	Create(ctx context.Context, p *models.Concregation) (*models.Concregation, error)
+	GetByOrganizerId(ctx context.Context, organizerId int64) ([]*models.Concregation, error)
+	Update(ctx context.Context, p *models.Concregation) (*models.Concregation, error)
+	Delete(ctx context.Context, id int64) (bool, error)
+}
+
+type DeviceInventoryRepository interface {
+	Create(ctx context.Context, p *models.DeviceInventory) (*models.DeviceInventory, error)
+	GetByOrganizerId(ctx context.Context, deviceInventoryId int64) ([]*models.DeviceInventory, error)
+	Update(ctx context.Context, p *models.DeviceInventory) (*models.DeviceInventory, error)
+	Delete(ctx context.Context, id int64) (bool, error)
+}
+
+type ServiceScheduleRepository interface {
+	Create(ctx context.Context, p *models.ServiceSchedule) (*models.ServiceSchedule, error)
+	GetByOrganizerId(ctx context.Context, serviceScheduleId int64) ([]*models.ServiceSchedule, error)
+	Update(ctx context.Context, p *models.ServiceSchedule) (*models.ServiceSchedule, error)
+	Delete(ctx context.Context, id int64) (bool, error)
+}
+
+type SectorCoordinatorRepository interface {
+	Create(ctx context.Context, p *models.SectorCoordinator) (*models.SectorCoordinator, error)
+	GetByOrganizerId(ctx context.Context, sectorCoordinatorId int64) ([]*models.SectorCoordinator, error)
+	Update(ctx context.Context, p *models.SectorCoordinator) (*models.SectorCoordinator, error)
+	Delete(ctx context.Context, id int64) (bool, error)
+}

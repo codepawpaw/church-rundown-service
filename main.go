@@ -40,6 +40,10 @@ func main() {
 	authHandler := ph.InitAuthHandler(connection, jwtServiceObj)
 	rundownHandler := ph.InitRundownHandler(connection)
 	rundownItemHandler := ph.InitRundownItemHandler(connection)
+	concregationHandler := ph.InitConcregationHandler(connection)
+	deviceInventoryHandler := ph.InitDeviceInventoryHandler(connection)
+	serviceScheduleHandler := ph.InitServiceScheduleHandler(connection)
+	sectorCoordinator := ph.InitSectorCoordinatorHandler(connection)
 
 	cors := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
@@ -109,6 +113,34 @@ func main() {
 				route.Post("/", rundownItemHandler.Create)
 				route.Put("/", rundownItemHandler.Update)
 				route.Delete("/{id:[0-9]+}", rundownItemHandler.Delete)
+			})
+
+			rt.Route("/concregation", func(route chi.Router) {
+				route.Post("/", concregationHandler.Create)
+				route.Put("/", concregationHandler.Update)
+				route.Delete("/{id:[0-9]+}", concregationHandler.Delete)
+				route.Get("/{organizerId:[0-9]+}", concregationHandler.GetByOrganizerId)
+			})
+
+			rt.Route("/device_inventory", func(route chi.Router) {
+				route.Post("/", deviceInventoryHandler.Create)
+				route.Put("/", deviceInventoryHandler.Update)
+				route.Delete("/{id:[0-9]+}", deviceInventoryHandler.Delete)
+				route.Get("/{organizerId:[0-9]+}", deviceInventoryHandler.GetByOrganizerId)
+			})
+
+			rt.Route("/service_schedule", func(route chi.Router) {
+				route.Post("/", serviceScheduleHandler.Create)
+				route.Put("/", serviceScheduleHandler.Update)
+				route.Delete("/{id:[0-9]+}", serviceScheduleHandler.Delete)
+				route.Get("/{organizerId:[0-9]+}", serviceScheduleHandler.GetByOrganizerId)
+			})
+
+			rt.Route("/sector_coordinator", func(route chi.Router) {
+				route.Post("/", sectorCoordinator.Create)
+				route.Put("/", sectorCoordinator.Update)
+				route.Delete("/{id:[0-9]+}", sectorCoordinator.Delete)
+				route.Get("/{organizerId:[0-9]+}", sectorCoordinator.GetByOrganizerId)
 			})
 		})
 	})

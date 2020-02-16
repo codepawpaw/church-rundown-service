@@ -52,6 +52,42 @@ rundown_id int,
 FOREIGN KEY (rundown_id) REFERENCES rundowns(id)
 );
 
+CREATE TABLE concregation (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    name varchar(350),
+    age int,
+    address varchar(250),
+    organizer_id int,
+    FOREIGN KEY (organizer_id) REFERENCES organizers(id)
+);
+
+CREATE TABLE device_inventory (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    name varchar(400),
+    purchase_date datetime,
+    total int,
+    organizer_id int,
+    FOREIGN KEY (organizer_id) REFERENCES organizers(id)
+);
+
+CREATE TABLE service_schedule (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    name varchar(400),
+    text text,
+    date datetime,
+    organizer_id int,
+    FOREIGN KEY (organizer_id) REFERENCES organizers(id)
+);
+
+CREATE TABLE sector_coordinator (
+    id int PRIMARY KEY AUTO_INCREMENT,
+    name varchar(400),
+    concregation_id int,
+    organizer_id int,
+    FOREIGN KEY(organizer_id) REFERENCES organizers(id),
+    FOREIGN KEY (concregation_id) REFERENCES concregation(id)
+);
+
 -- INSERT INTO organizers(name, description) values('Organizer 1', 'Description of organizer 1');
 -- INSERT INTO organizers(name, description) values('Organizer 2', 'Description of organizer 2');
 -- INSERT INTO organizers(name, description) values('Organizer 3', 'Description of organizer 3');
